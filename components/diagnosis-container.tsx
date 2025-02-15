@@ -1,112 +1,76 @@
-import db from "@/lib/db";
-import { Diagnosis, MedicalRecords } from "@prisma/client";
-import { AddDiagnosis } from "./dialogs/add-diagnosis";
-import { NoDataFound } from "./no-data-found";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { SelectSeparator } from "./ui/select";
-import { MedicalHistoryCard } from "./cards/medical-history-card";
-import { checkRole } from "@/utils/roles";
-import { auth } from "@clerk/nextjs/server";
+// "use client";
 
-interface DataProps {
-  id: string | number;
-  patientId: string;
-  medicalId?: string;
-  doctor_id: string | number;
-}
+// import { addNewDiagnosis } from "@/app/actions/medical";
+// import { Button } from "./ui/button";
+// import { Card } from "./ui/card";
+// import { Form } from "./ui/form";
+// import { DiagnosisSchema } from "@/lib/schema";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { MedicalRecords, Patient } from "@prisma/client";
+// import { useForm } from "react-hook-form";
+// import { toast } from "sonner";
+// import * as z from "zod";
+// import { useRouter } from "next/navigation";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "./ui/dialog";
 
-interface Doctor {
-  id: string | number;
-  name: string;
-  specialization: string;
-}
+// export const DiagnosisForm = ({
+//   patient,
+//   medicalRecords,
+// }: {
+//   patient: Patient;
+//   medicalRecords: MedicalRecords[];
+// }) => {
+//   const router = useRouter();
 
-interface ExtendedDiagnosis extends Diagnosis {
-  doctor: Doctor;
-}
+//   const form = useForm<z.infer<typeof DiagnosisSchema>>({
+//     resolver: zodResolver(DiagnosisSchema),
+//     defaultValues: {
+//       patient_id: patient.id,
+//       medical_id: "", // Set this dynamically if needed
+//       doctor_id: "", // Set this dynamically if needed
+//       symptoms: "",
+//       diagnosis: "",
+//       notes: "",
+//       prescribed_medications: "",
+//       follow_up_plan: "",
+//     },
+//   });
 
-interface MedicalPros extends MedicalRecords {
-  diagnosis: ExtendedDiagnosis[];
-}
+//   const onSubmit = (data: z.infer<typeof DiagnosisSchema>) => {
+//     addNewDiagnosis(data)
+//       .then((response) => {
+//         toast.success(response.msg);
+//         router.push("/somepath"); // Redirect after success
+//       })
+//       .catch((error) => {
+//         toast.error(error.msg);
+//       });
+//   };
 
-export const DiagnosisContainer = async ({
-  id,
-  patientId,
-  doctor_id,
-}: DataProps) => {
-  const { userId } = auth();
-  const data: MedicalPros | null = await db.medicalRecords.findFirst({
-    where: {
-      appointment_id: Number(id),
-    },
-    include: {
-      diagnosis: {
-        include: {
-          doctor: true,
-        },
-        orderBy: { created_at: "desc" },
-      },
-    },
-    orderBy: { created_at: "desc" },
-  });
-
-  const diagnosis = data?.diagnosis ? data?.diagnosis : null;
-
-  return (
-    <div className="">
-      {diagnosis?.length === 0 || !diagnosis ? (
-        <div className="flex flex-col items-center justify-center mt-20">
-          <NoDataFound note="No Diagnosis found for this appointment" />
-          {(!checkRole("PATIENT") || doctor_id === userId) && (
-            <AddDiagnosis
-              key={new Date().getTime()}
-              patientId={patientId}
-              doctor_id={doctor_id}
-              appointment_id={id}
-              medicalId={data ? data?.id.toString() : ""}
-            />
-          )}
-        </div>
-      ) : (
-        <section className="space-y-6">
-          <Card className="rounded-xl shadow-none">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div className="w-full flex flex-col md:flex-row md:items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg text-gray-600">
-                    Medical Record
-                  </CardTitle>
-                  <CardDescription>
-                    There are <strong>{diagnosis?.length}</strong> medical
-                    record(s) associated with this appointment
-                  </CardDescription>
-                </div>
-
-                {(!checkRole("PATIENT") || doctor_id === userId) && (
-                  <AddDiagnosis
-                    key={new Date().getTime()}
-                    patientId={patientId}
-                    doctor_id={doctor_id}
-                    appointment_id={id}
-                    medicalId={data ? data?.id.toString() : ""}
-                  />
-                )}
-              </div>
-            </CardHeader>
-          </Card>
-          {diagnosis?.map((el, id) => (
-            <div key={id}>
-              <MedicalHistoryCard el={el} index={id} />
-            </div>
-          ))}
-        </section>
-      )}
-    </div>
-  );
-};
+//   return (
+//     <Dialog>
+//       <DialogTrigger asChild>
+//         <Button variant="outline">Open Diagnosis Form</Button>
+//       </DialogTrigger>
+//       <DialogContent>
+//         <DialogHeader>
+//           <DialogTitle>Add Diagnosis</DialogTitle>
+//         </DialogHeader>
+//         <Card>
+//           <Form {...form}>
+//             <form onSubmit={form.handleSubmit(onSubmit)}>
+//               {/* Your form fields go here */}
+//               <Button type="submit">Submit Diagnosis</Button>
+//             </form>
+//           </Form>
+//         </Card>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };

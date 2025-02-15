@@ -26,11 +26,9 @@ import { useRouter } from "next/navigation";
 export const LabRequestForm = ({
   patient,
   medicalRecords,
-  availableTest,
 }: {
   patient: Patient;
   medicalRecords: MedicalRecords[];
-  availableTest: { id: number; name: string }[];
 }) => {
   const router = useRouter();
   const form = useForm<z.infer<typeof LabRequestSchema>>({
@@ -41,7 +39,7 @@ export const LabRequestForm = ({
       patientId: "",
       age: "",
       gender: undefined,
-      testTypes: [],
+      testTypes: [], // Ensure this matches the expected enum type
       priority: undefined,
       requestDate: new Date().toISOString().split("T")[0],
       specialInstructions: "",
@@ -53,7 +51,6 @@ export const LabRequestForm = ({
   async function onSubmit(values: z.infer<typeof LabRequestSchema>) {
     try {
       setIsLoading(true);
-
       const res = await addLabRequest(values);
       router.refresh();
       toast.success("The lab test request has been submitted successfully.");
@@ -73,8 +70,8 @@ export const LabRequestForm = ({
       patientName: patient?.first_name + " " + patient?.last_name,
       patientId: patient.id,
       age: AGE,
-      gender: patient.gender.toLowerCase()! as "male" | "female",
-      testTypes: [],
+      gender: patient.gender.toLowerCase() as "male" | "female",
+      testTypes: [], // Ensure this is correctly reset
       priority: undefined,
       requestDate: new Date().toISOString().split("T")[0],
       specialInstructions: "",
@@ -94,7 +91,7 @@ export const LabRequestForm = ({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <PatientInfoSection form={form} data={medicalRecords} />
-              <TestDetailsSection form={form} data={availableTest} />
+              <TestDetailsSection form={form} /> {/* Removed the `data` prop */}
               <Button disabled={isLoading} type="submit" className="w-full">
                 Submit Request
               </Button>

@@ -188,8 +188,9 @@ export const ServicesSchema = z.object({
 export const PaymentSchema = z.object({
   id: z.string(),
   bill_date: z.coerce.date(),
-  discount: z.string({ message: "discount" }),
+  discount: z.string().optional(), // Optional if there's a chance it might be empty
   total_amount: z.string(),
+  appointment_id: z.number(),  // Add appointment_id if it's needed and should be a number
 });
 
 export const PatientBillSchema = z.object({
@@ -210,8 +211,10 @@ export const LabRequestSchema = z.object({
   gender: z.enum(["male", "female"], {
     required_error: "Please select a gender",
   }),
-  testTypes: z.array(z.string()).min(1, "Please select at least one test type"),
-  priority: z.enum(["routine", "urgent", "stat"], {
+  testTypes: z.array(z.enum(["blood test", "x-ray", "MRI", "CT scan", "ultrasound", "ECG", "other"]), {
+    required_error: "Please select priority level",
+  }),
+    priority: z.enum(["routine", "urgent", "stat"], {
     required_error: "Please select priority level",
   }),
   requestDate: z.string().min(1, "Request date is required"),

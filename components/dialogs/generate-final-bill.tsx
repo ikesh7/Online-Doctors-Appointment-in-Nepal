@@ -24,33 +24,50 @@ import { Form } from "../ui/form";
 interface DataProps {
   id?: string | number;
   total_bill: number;
+  appointment_id: number; // Pass appointment_id as a prop
 }
-export const GenerateFinalBills = ({ id, total_bill }: DataProps) => {
+
+export const GenerateFinalBills = ({
+  id,
+  total_bill,
+  appointment_id,
+}: DataProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  let discountInfo = null;
 
+  // Set defaultValues, including appointment_id from the props
   const form = useForm<z.infer<typeof PaymentSchema>>({
     resolver: zodResolver(PaymentSchema),
     defaultValues: {
       id: id?.toString(),
       bill_date: new Date(),
-      discount: "0",
-      total_amount: total_bill.toString(),
+      discount: "0", // Default discount value
+      total_amount: total_bill.toString(), // Automatically filled based on the passed prop
+      appointment_id: appointment_id, // Automatically filled from the prop
     },
   });
 
   const handleOnSubmit = async (values: z.infer<typeof PaymentSchema>) => {
     try {
       setIsLoading(true);
-      alert("Please");
-      const resp = await generateBill(values);
+
+      // Convert appointment_id to a number before sending to the backend
+      const appointmentId = Number(values.appointment_id);
+
+      if (isNaN(appointmentId)) {
+        toast.error("Please enter a valid Appointment ID.");
+        setIsLoading(false);
+        return;
+      }
+
+      const resp = await generateBill({
+        ...values,
+        appointment_id: appointmentId, // Ensure it's sent as a number
+      });
 
       if (resp.success) {
         toast.success("Patient bill generated successfully!");
-
         router.refresh();
-
         form.reset();
       } else if (resp.error) {
         toast.error(resp.msg);
@@ -107,6 +124,12 @@ export const GenerateFinalBills = ({ id, total_bill }: DataProps) => {
                 placeholder=""
                 inputType="date"
               />
+
+              {/* Display appointment_id instead of input field */}
+              <div className="flex flex-col">
+                <label className="font-medium text-sm">Appointment ID</label>
+                <p className="text-lg font-semibold">{appointment_id}</p>
+              </div>
 
               <Button
                 type="submit"

@@ -65,7 +65,7 @@ export const BillsContainer = async ({ id }: BillProps) => {
         include: {
           service: {
             select: {
-              service_name: true,
+              name: true,
             },
           },
         },

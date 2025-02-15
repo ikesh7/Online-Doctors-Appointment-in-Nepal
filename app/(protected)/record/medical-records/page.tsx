@@ -13,40 +13,17 @@ import { DATA_LIMIT } from "@/utils/settings";
 import { BriefcaseBusiness, ListFilter } from "lucide-react";
 
 const columns = [
-  {
-    header: "No",
-    key: "no",
-    // className: "hidden md:table-cell",
-  },
-  {
-    header: "Info",
-    key: "name",
-  },
+  { header: "No", key: "no" },
+  { header: "Info", key: "name" },
   {
     header: "Date & Time",
     key: "medical_date",
     className: "hidden md:table-cell",
   },
-  {
-    header: "Doctor",
-    key: "doctor",
-    className: "hidden 2xl:table-cell",
-  },
-  {
-    header: "Diagnosis",
-    key: "diagnosis",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "Lab Test",
-    key: "lab_test",
-    className: "hidden 2xl:table-cell",
-  },
-  {
-    header: "Action",
-    key: "action",
-    className: "",
-  },
+  { header: "Doctor", key: "doctor", className: "hidden 2xl:table-cell" },
+  { header: "Diagnosis", key: "diagnosis", className: "hidden lg:table-cell" },
+  { header: "Lab Test", key: "lab_test", className: "hidden 2xl:table-cell" },
+  { header: "Action", key: "action", className: "" },
 ];
 
 const MedicalRecordsPage = async (props: SearchParamsProps) => {
@@ -55,13 +32,11 @@ const MedicalRecordsPage = async (props: SearchParamsProps) => {
   const searchQuery = (searchParams?.q || "") as string;
 
   const { data, totalRecord, totalPages, currentPage } =
-    await getMedicalRecords({
-      page,
-      limit: DATA_LIMIT,
-      search: searchQuery,
-    });
+    await getMedicalRecords({ page, limit: DATA_LIMIT, search: searchQuery });
 
   const renderRow = (item: ExtendedMedicalHistory) => {
+    console.log("Medical Record Item:", item); // ✅ Debugging to check if lab_test exists
+
     return (
       <tr
         key={item.id}
@@ -72,11 +47,11 @@ const MedicalRecordsPage = async (props: SearchParamsProps) => {
         <td className="flex items-center gap-2 2xl:gap-4 py-2 xl:py-4">
           <ProfileImage
             url={item?.patient?.img!}
-            name={item?.patient?.first_name + " " + item?.patient?.last_name}
+            name={`${item?.patient?.first_name} ${item?.patient?.last_name}`}
           />
           <div>
             <h3 className="md:font-semibold uppercase">
-              {item?.patient?.first_name + " " + item?.patient?.last_name}
+              {item?.patient?.first_name} {item?.patient?.last_name}
             </h3>
             <span className="text-xs capitalize">
               {item?.patient?.gender.toLowerCase()}
@@ -88,43 +63,44 @@ const MedicalRecordsPage = async (props: SearchParamsProps) => {
           {formatDateTime(item?.created_at.toString())}
         </td>
 
-        <td className="hidden  items-center py-2  2xl:table-cell">
+        <td className="hidden items-center py-2 2xl:table-cell">
           {item?.doctor_id}
         </td>
+
         <td className="hidden lg:table-cell">
           {item?.diagnosis?.length === 0 ? (
             <span className="text-sm italic text-gray-500">
               No diagnosis found
             </span>
           ) : (
-            <>
-              <MedicalHistoryDialog
-                id={item?.appointment_id}
-                patientId={item?.patient_id}
-                doctor_id={item?.doctor_id}
-                label={
-                  <div className="flex gap-x-2 items-center text-lg">
-                    {item?.diagnosis?.length}
-
-                    <span className="text-sm">Found</span>
-                  </div>
-                }
-              />
-            </>
+            <MedicalHistoryDialog
+              id={item?.appointment_id}
+              patientId={item?.patient_id}
+              doctor_id={item?.doctor_id}
+              label={
+                <div className="flex gap-x-2 items-center text-lg">
+                  {item?.diagnosis?.length}
+                  <span className="text-sm">Found</span>
+                </div>
+              }
+            />
           )}
         </td>
+
+        {/* ✅ Updated Lab Test Section */}
         <td className="hidden 2xl-table-cell">
-          {" "}
-          {item?.lab_test?.length === 0 ? (
+          {Array.isArray(item?.lab_test) && item.lab_test.length > 0 ? (
+            <div className="flex flex-col gap-y-1">
+              {item.lab_test.map((test: any, index: number) => (
+                <span key={index} className="text-sm">
+                  {test.name || "Unnamed Test"}
+                </span>
+              ))}
+            </div>
+          ) : (
             <span className="text-sm italic text-gray-500">
               No lab test found
             </span>
-          ) : (
-            <div className="flex gap-x-2 items-center text-lg">
-              {item?.lab_test?.length}
-
-              <span className="text-sm">Found</span>
-            </div>
           )}
         </td>
 

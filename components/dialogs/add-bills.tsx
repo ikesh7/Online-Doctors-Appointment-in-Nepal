@@ -25,7 +25,7 @@ import { Form } from "../ui/form";
 interface DataProps {
   id?: string | number;
   appId?: string | number;
-  servicesData: Services[];
+  servicesData: Services[]; // Ensure the price is passed as a number
 }
 export const AddBills = ({ id, appId, servicesData }: DataProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -52,9 +52,7 @@ export const AddBills = ({ id, appId, servicesData }: DataProps) => {
 
       if (resp.success) {
         toast.success("Patient bill added successfully!");
-
         router.refresh();
-
         form.reset();
       } else if (resp.error) {
         toast.error(resp.msg);
@@ -72,7 +70,7 @@ export const AddBills = ({ id, appId, servicesData }: DataProps) => {
       setData(
         servicesData?.map((service) => ({
           value: service.id.toString(),
-          label: service.service_name,
+          label: service.name,
         }))
       );
     }
@@ -88,12 +86,14 @@ export const AddBills = ({ id, appId, servicesData }: DataProps) => {
       );
 
       if (unit_cost) {
-        form.setValue("unit_cost", unit_cost?.price.toFixed(2));
+        // Ensure Decimal to number conversion here
+        form.setValue("unit_cost", Number(unit_cost?.price).toFixed(2)); // Convert Decimal to number
       }
-      if (quantity) {
+
+      if (quantity && unit_cost) {
         form.setValue(
           "total_cost",
-          (Number(quantity) * unit_cost?.price!).toFixed(2)
+          (Number(quantity) * Number(unit_cost?.price)).toFixed(2) // Convert Decimal to number
         );
       }
     }
@@ -112,7 +112,7 @@ export const AddBills = ({ id, appId, servicesData }: DataProps) => {
           <CardHeader className="px-0">
             <DialogTitle>Add Patient Bill</DialogTitle>
             <CardDescription>
-              Ensure accurate readings are perform as this may affect the
+              Ensure accurate readings are performed as this may affect the
               diagnosis and other medical processes.
             </CardDescription>
           </CardHeader>

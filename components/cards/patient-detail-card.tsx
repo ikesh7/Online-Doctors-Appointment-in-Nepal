@@ -1,11 +1,17 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { calculateAge, formatPhoneNumber } from "@/utils";
 import { Patient } from "@prisma/client";
 import { Calendar, Clipboard, Home, Info, Mail, Phone } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import VideoCall from "@/components/VideoCall";
 
-export function PatientDetailCard({ data }: { data: Patient }) {
+export function PatientDetailCard({ data }: { data: any }) {
+  const [showVideoCall, setShowVideoCall] = useState(false);
+
   return (
     <Card className="p-4 bg-white shadow-none rounded-xl">
       <CardHeader className="flex items-start gap-4">
@@ -31,10 +37,16 @@ export function PatientDetailCard({ data }: { data: Patient }) {
             size="sm"
             variant="outline"
             className="flex justify-center bg-blue-100 text-blue-600 gap-x-3 px-4"
+            onClick={() =>
+              window.open("/video-call", "_blank", "width=800,height=600")
+            }
+            //onClick={() => setShowVideoCall(true)}
           >
             <Phone size={18} />
             Call
           </Button>
+
+          {showVideoCall && <VideoCall />}
           <Button
             size="sm"
             variant="outline"

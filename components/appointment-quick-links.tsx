@@ -37,12 +37,12 @@ export const AppointmentQuickLinks = ({ staffId }: { staffId?: string }) => {
         >
           Lab Tests
         </Link>
-        <Link
+        {/* <Link
           href="?cat=diagnosis"
           className="px-4 py-2 rounded-lg bg-blue-100 text-blue-600"
         >
           Diagnosis
-        </Link>
+        </Link> */}
 
         <Link
           href="?cat=appointment#vital-signs"

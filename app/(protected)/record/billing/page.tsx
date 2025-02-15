@@ -80,8 +80,8 @@ const BillingRecords = async (props: SearchParamsProps) => {
   const searchParams = await props.searchParams;
   const page = (searchParams?.p || "1") as string;
   const searchQuery = (searchParams?.q || "") as string;
-  const { userId } = auth();
-  const userRole = getRole();
+  // const { userId } = auth();
+  // const userRole = getRole();
 
   const { data, totalRecord, totalPages, currentPage } =
     await getPaymentRecords({
@@ -149,27 +149,27 @@ const BillingRecords = async (props: SearchParamsProps) => {
 
         <td className="">
           <div className="flex items-center">
-            <ViewAction
+            {/* <ViewAction
               href={`appointments/${item?.appointment_id}?cat=bills`}
               disabled={
                 userRole === "admin" ? false : userId !== item?.patient_id
               }
-            />
+            /> */}
             <Button
-              disabled={item?.patient_id !== userId || userRole !== "cashier"}
+              // disabled={item?.patient_id !== userId || userRole !== "cashier"}
               variant="ghost"
               className="flex items-center gap-2 justify-start  text-gray-600 text-sm font-light"
             >
               Pay
             </Button>
 
-            {checkRole("ADMIN") && (
+            {/* {checkRole("ADMIN") && (
               <ActionDialog
                 type="delete"
                 deleteType="payment"
                 id={item?.id.toString()}
               />
-            )}
+            )} */}
           </div>
         </td>
       </tr>

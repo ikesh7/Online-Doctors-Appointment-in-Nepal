@@ -22,56 +22,46 @@ import { UseFormReturn } from "react-hook-form";
 
 interface TestDetailsSectionProps {
   form: UseFormReturn<any>;
-  data: { id: number; name: string }[];
 }
 
-export const TestDetailsSection = ({ form, data }: TestDetailsSectionProps) => {
+export const TestDetailsSection = ({ form }: TestDetailsSectionProps) => {
+  const testTypes = [
+    "blood test",
+    "x-ray",
+    "MRI",
+    "CT scan",
+    "ultrasound",
+    "ECG",
+    "other",
+  ];
   return (
     <>
+      {/* Test Type Selection with Checkboxes */}
       <FormField
         control={form.control}
         name="testTypes"
-        render={() => (
+        render={({ field }) => (
           <FormItem>
-            <FormLabel>Test Types</FormLabel>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {data?.map((test) => (
-                <FormField
-                  key={test.id}
-                  control={form.control}
-                  name="testTypes"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={test.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(test.id.toString())}
-                            onCheckedChange={(checked) => {
-                              const currentValue = field.value || [];
-                              return checked
-                                ? field.onChange([
-                                    ...currentValue,
-                                    test.id.toString(),
-                                  ])
-                                : field.onChange(
-                                    currentValue.filter(
-                                      (value: String) =>
-                                        value !== test.id.toString()
-                                    )
-                                  );
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {test?.name}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
+            <FormLabel>Test Type</FormLabel>
+            <div className="space-y-2">
+              {testTypes.map((testType) => (
+                <div key={testType} className="flex items-center">
+                  <Checkbox
+                    checked={field.value?.includes(testType)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        field.onChange([...field.value, testType]);
+                      } else {
+                        field.onChange(
+                          field.value.filter(
+                            (item: string) => item !== testType
+                          )
+                        );
+                      }
+                    }}
+                  />
+                  <span className="ml-2">{testType}</span>
+                </div>
               ))}
             </div>
             <FormMessage />
@@ -80,6 +70,7 @@ export const TestDetailsSection = ({ form, data }: TestDetailsSectionProps) => {
       />
 
       <div className="grid gap-4 md:grid-cols-2">
+        {/* Priority Selection */}
         <FormField
           control={form.control}
           name="priority"
@@ -103,6 +94,7 @@ export const TestDetailsSection = ({ form, data }: TestDetailsSectionProps) => {
           )}
         />
 
+        {/* Request Date */}
         <FormField
           control={form.control}
           name="requestDate"
@@ -118,6 +110,7 @@ export const TestDetailsSection = ({ form, data }: TestDetailsSectionProps) => {
         />
       </div>
 
+      {/* Special Instructions */}
       <FormField
         control={form.control}
         name="specialInstructions"

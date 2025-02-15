@@ -6,7 +6,7 @@ export const routeAccess: RouteAccessProps = {
   "/admin(.*)": ["admin"],
   "/patient(.*)": ["patient", "admin", "doctor", "nurse"],
   "/doctor(.*)": ["doctor"],
-  "/staff(.*)": ["nurse", "cashier"],
+  "/staff(.*)": ["staffs"],
   "/record/users": ["admin"],
   "/record/doctors": ["admin"],
   "/record/doctors(.*)": ["admin", "doctor"],

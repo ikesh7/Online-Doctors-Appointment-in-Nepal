@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 
 export async function deleteDataById(id: string, type: DeleteType) {
   try {
+    // Step 1: Handle deletion from the database
     switch (type) {
       case "doctor":
         await db.doctor.delete({ where: { id } });
@@ -34,17 +35,41 @@ export async function deleteDataById(id: string, type: DeleteType) {
         break;
     }
 
+    // Step 2: Handle deletion from Clerk (if applicable)
     if (type === "patient" || type === "staff" || type === "doctor") {
-      const client = await clerkClient();
-      await client.users.deleteUser(id);
+      // Validate the id before proceeding with Clerk API call
+      if (!id || typeof id !== 'string') {
+        console.error("Invalid user ID provided for deletion:", id);
+        return { success: false, message: "Invalid user ID provided" };
+      }
+
+      try {
+        const client = await clerkClient();
+        console.log(`Attempting to delete ${type} with id: ${id}`); // Log the id before deletion
+
+        await client.users.deleteUser(id); // id should be the userId from Clerk
+        console.log(`${type} deleted from Clerk with id: ${id}`); // Successful deletion log
+      } catch (error: any) {
+        // Log detailed error from Clerk API
+        if (error?.message) {
+          console.error(`Error deleting ${type} with id: ${id}:`, error.message);
+        } else {
+          console.error(`Unknown error deleting ${type} with id: ${id}:`, error);
+        }
+        return { success: false, message: "Error deleting from Clerk" };
+      }
     }
 
+    // Final success message after all deletions
     return { success: true, message: "Data deleted successfully" };
   } catch (error) {
-    console.log(error);
+    // Log the general error
+    console.error("Error during data deletion:", error);
     return { success: false, message: "Internal Server Error" };
   }
 }
+
+
 
 export const addReview = async (data: any) => {
   try {

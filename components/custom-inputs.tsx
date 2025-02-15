@@ -27,8 +27,9 @@ interface CustomInputProps {
   name: string;
   label: string;
   placeholder: string;
-  inputType?: "text" | "email" | "password" | "date";
+  inputType?: "text" | "email" | "password" | "date" | "number";
   selectList?: { label: string; value: string }[];
+  disabled?: boolean;
   defaultValue?: string;
 }
 
@@ -173,7 +174,7 @@ const RenderInput = ({
 };
 
 export const CustomInput = (props: CustomInputProps) => {
-  const { name, label, control, type } = props;
+  const { name, label, disabled, control, type } = props;
 
   return (
     <FormField
